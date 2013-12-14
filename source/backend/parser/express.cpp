@@ -1480,6 +1480,29 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 					EXIT
 				END_CASE
 
+				CASE(XY_TOKEN)
+					assert(*Terms >= 2);
+					*Terms = 2;
+					return;
+				END_CASE
+
+				CASE(YZ_TOKEN)
+					if (*Terms < 3)
+						Error("Can't use .yz on a 2D vector");
+					Express[X] = Express[Y];
+					Express[Y] = Express[Z];
+					*Terms = 2;
+					return;
+				END_CASE
+
+				CASE(XZ_TOKEN)
+					if (*Terms < 3)
+						Error("Can't use .xz on a 2D vector");
+					Express[Y] = Express[Z];
+					*Terms = 2;
+					return;
+				END_CASE
+
 				OTHERWISE
 					Expectation_Error ("x, y, z or color component");
 				END_CASE
