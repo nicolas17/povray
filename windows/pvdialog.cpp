@@ -81,7 +81,6 @@ extern char             render_complete_sound [_MAX_PATH] ;
 extern char             parse_error_sound [_MAX_PATH] ;
 extern char             render_error_sound [_MAX_PATH] ;
 extern char             queued_files [MAX_QUEUE] [_MAX_PATH] ;
-extern bool             IsW95UserInterface ;
 extern bool             use_editors;
 extern bool             running_demo ;
 extern bool             render_complete_sound_enabled ;
@@ -148,11 +147,6 @@ void AddQueue (HWND hWnd, HWND hlb)
   ofnTemp.Flags |= OFN_ALLOWMULTISELECT ;
   if (GetOpenFileName (&ofnTemp) != false)
   {
-    // convert spaces into NULL's if we're not using the new interface so it works with the below code
-    if (!IsW95UserInterface)
-      for (s = name ; *s ; s++)
-        if (*s == ' ')
-          *s = '\0' ;
     if (ofnTemp.nFileOffset < strlen (name))
     {
       strcpy (lastQueuePath, name) ;

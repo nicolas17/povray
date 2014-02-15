@@ -241,7 +241,6 @@ bool                    parse_error_sound_enabled  ;
 bool                    render_error_sound_enabled ;
 bool                    alert_on_completion ;
 bool                    save_settings ;
-bool                    IsW95UserInterface = true;
 bool                    IsW98 ;
 bool                    IsWNT ;
 bool                    IsW2k ;
@@ -922,7 +921,6 @@ void getvars (ExternalVarStruct *v)
   v->povray_return_code = povray_return_code ;
   v->rendering = rendering ;
   v->IsWin32 = true ;
-  v->IsW95UserInterface = IsW95UserInterface ;
   v->running_demo = running_demo ;
   v->debugging = debugging ;
   v->isMaxiMinimized = false ;
@@ -2518,9 +2516,7 @@ void init_ofn (OPENFILENAME *ofn, HWND hWnd, char *title, char *name, int maxlen
   ofn->lpstrFileTitle = NULL ;
   ofn->nMaxFileTitle = 0 ;
   ofn->lpstrInitialDir = lastPath ;
-  ofn->Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR ;
-  if (IsW95UserInterface)
-    ofn->Flags |= OFN_EXPLORER ;
+  ofn->Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_EXPLORER ;
   ofn->nFileOffset = 0 ;
   ofn->nFileExtension = 0 ;
   ofn->lpstrDefExt = defaultExt ;
@@ -3822,14 +3818,10 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
          return (0) ;
 
     case WM_ENTERSIZEMOVE :
-         if (!IsW95UserInterface)
-           break ;
          resizing = true ;
          break ;
 
     case WM_EXITSIZEMOVE :
-         if (!IsW95UserInterface)
-           break ;
          resizing = false ;
          InvalidateRect (message_window, NULL, true) ;
          break ;
@@ -5659,9 +5651,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   IsWXP = HaveWinXPOrLater () ;
   IsVista = HaveVistaOrLater () ;
 
-  // yes, we actually used to support the windows 3.1 UI ...
-  IsW95UserInterface = true ;
-
   ourIcon = LoadIcon (hInstance, MAKEINTRESOURCE (IsWXP ? IDI_PVENGINE_XP : IDI_PVENGINE)) ;
   renderIcon = LoadIcon (hInstance, MAKEINTRESOURCE (IsWXP ? IDI_RENDERWINDOW_XP : IDI_RENDERWINDOW)) ;
 
@@ -5687,19 +5676,9 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   if (PerformanceFrequency > 1999999)
     PerformanceScale = PerformanceFrequency / 1000000 ;
 
-  // 'IsW95UserInterface' dates from when Windows 95 and NT4 were introduced
-  // (at that time we still supported the old Windows 3.1 UI)
-  // IsW95UserInterface = GetHKCU("General", "UseW95UserInterface", 1) != 0 ;
-  IsW95UserInterface = true;
   info_render_complete = GetHKCU("Info", "RenderCompleteSound", 0) != 0 ;
 
   SetupFrontend();
-
-  if (!IsW95UserInterface)
-  {
-    PVEnableMenuItem (CM_SHOWMAINWINDOW, MF_GRAYED) ;
-    use_taskbar = false ;
-  }
 
   create_about_font () ;
 
@@ -6199,8 +6178,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
       message_printf ("Win2k or later detected\n") ;
     if (HaveWinXPOrLater ())
       message_printf ("WinXP or later detected\n") ;
-    if (IsW95UserInterface)
-      message_printf ("Windows 95 user interface flag is set\n") ;
   }
 
   for (i = 0 ; i < EditFileCount ; i++)
